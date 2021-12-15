@@ -1,0 +1,34 @@
+---
+- hosts: rocky
+  tasks:
+#    - name: Installer Apache
+#      ansible.builtin.dnf:
+#        name=httpd state=present update_cache=true
+
+#    - name: Installer Php7
+#      ansible.builtin.dnf:
+#        name=php state=present
+
+#    - name: Appel du Playbook Debian
+#      include_tasks: apache2-lamp-debian.yml
+#      when: ansible_os_family == 'RedHat'
+
+    - name: Installer Apache et PHP7
+      ansible.builtin.dnf:
+        name="{{ item }}" state=present
+      loop:
+         - httpd
+         - php
+
+    - name: Démarrer le service Apache
+      ansible.builtin.service:
+        name=httpd state=started enabled=true
+
+    - name: Recharger le service Apache
+      tags: reload
+      ansible.builtin.service:
+        name=httpd state=reloaded
+
+    - name: copier un phpinfo
+      ansible.builtin.copy:
+        src=info.php dest=/var/www/html/index.php owner=apache group=apache mode=0664
