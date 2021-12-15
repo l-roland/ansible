@@ -1,0 +1,33 @@
+---
+- hosts: debian
+  tasks:
+#    - name: Installer Apache
+#      ansible.builtin.apt:
+#        name=apache2 state=present update_cache=true
+#
+#    - name: Installer Php7
+#      ansible.builtin.apt:
+#        name=libapache2-mod-php7.4 state=present
+
+#    - include_tasks: httpd-lamp-rocky.yml
+#      when: ansible_facts['ansible_os_family'] == 'Debian'
+
+    - name: Installer Apache et PHP7
+      ansible.builtin.apt:
+        name="{{ item }}" state=present
+      loop:
+         - apache2
+         - libapache2-mod-php7.4
+
+    - name: Démarrer le service Apache
+      ansible.builtin.service:
+        name=apache2 state=started enabled=true
+
+    - name: Recharger le service Apache
+      tags: reload
+      ansible.builtin.service:
+        name=apache2 state=reloaded
+
+    - name: copier un phpinfo
+      ansible.builtin.copy:
+        src=info.php dest=/var/www/html/index.php owner=www-data group=www-data mode=0664
